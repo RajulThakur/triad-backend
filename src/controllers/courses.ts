@@ -188,5 +188,43 @@ const updateCourse = async (
   }
 };
 
+const deleteCourse = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  const { courseId } = req.params;
 
-export { createCourse, getCourseById, updateCourse};
+  if (!courseId || Array.isArray(courseId)) {
+    return next(createHttpError(400, 'Course id is required'));
+  }
+
+  try {
+    const course = await prisma.course.findUnique({ where: { id: courseId } });
+
+    if (!course) {
+      return next(createHttpError(404, 'Course not found'));
+    }
+
+    // delete image from Cloudinary
+    if (course.coverImage) {
+      const publicId = getPublicId(course.coverImage);
+      if (publicId) {
+        await deleteOnCloudinary(publicId);
+      }
+    }
+
+    await prisma.course.delete({
+      where: { id: courseId },
+    });
+
+    return res.status(200).json({
+      message: 'Course deleted successfully',
+    });
+  } catch (error) {
+    console.log(error);
+    return next(createHttpError(500, 'Error while deleting course'));
+  }
+};
+
+export { createCourse, getCourseById, updateCourse, deleteCourse };

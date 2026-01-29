@@ -1,6 +1,7 @@
 import express from 'express';
 import {
   createCourse,
+  deleteCourse,
   getCourseById,
   updateCourse,
 } from '../controllers/courses.js';
@@ -11,5 +12,6 @@ const courseRouter = express.Router();
 courseRouter.route('/create').post(upload.single('coverImage'), createCourse);
 courseRouter.route('/:courseId').get(getCourseById);
 courseRouter.route('/:courseId').put(upload.single('coverImage'), updateCourse);
+courseRouter.route('/:courseId').delete(deleteCourse);
 
 export default courseRouter;
