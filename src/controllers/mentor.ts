@@ -68,7 +68,7 @@ const deleteMentor = async (
       await deleteOnCloudinary(publicId);
     }
     await prisma.mentor.delete({ where: { id: mentorId } });
-    
+
     return res.status(200).json({
       message: 'Mentor deleted successfully',
     });
@@ -78,4 +78,24 @@ const deleteMentor = async (
   }
 };
 
-export { createMentor, deleteMentor };
+const getAllMentor = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const mentors = await prisma.mentor.findMany();
+
+    // Optional: only if you want 404 when no mentors exist
+    if (mentors.length === 0) {
+      return res.status(404).json({ message: 'No mentors found' });
+    }
+
+    return res.status(200).json(mentors);
+  } catch (error) {
+    console.log(error);
+    return next(createHttpError(500, 'Error while getting all mentors'));
+  }
+};
+
+export { createMentor, deleteMentor, getAllMentor };
