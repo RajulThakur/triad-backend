@@ -227,4 +227,28 @@ const deleteCourse = async (
   }
 };
 
-export { createCourse, getCourseById, updateCourse, deleteCourse };
+const getAllCourses = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const courses = await prisma.course.findMany({
+      orderBy: {
+        createdAt: "desc",
+      },
+    });
+
+    if (courses.length === 0) {
+      return res.status(404).json({ message: 'No courses found' });
+    }
+
+    return res.status(200).json(courses);
+  } catch (error) {
+    console.log(error);
+    return next(createHttpError(500, "Error while getting all courses"));
+  }
+};
+
+
+export { createCourse, getCourseById, updateCourse, deleteCourse, getAllCourses };
