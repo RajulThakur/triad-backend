@@ -12,4 +12,8 @@ app.get("/", (req, res) => {
 import mentorRouter from './routers/mentor.js';
 app.use("/api/v1/mentors", mentorRouter);
 
+//course router
+import courseRouter from './routers/course.js';
+app.use("/api/v1/courses", courseRouter);
+
 export default app;
