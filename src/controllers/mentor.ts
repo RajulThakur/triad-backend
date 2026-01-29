@@ -4,9 +4,7 @@ import {
   deleteOnCloudinary,
   uploadonCloudinary,
 } from '../config/cloudinary.js';
-import path from 'node:path';
 import prisma from '../lib/prisma.js';
-import fs from 'node:fs';
 import { getPublicId } from '../lib/cloudinary.js';
 
 const createMentor = async (
@@ -17,8 +15,6 @@ const createMentor = async (
   try {
     const { name, experience, designation, linkedinUrl } = req.body;
     const imagefile = req.file;
-    console.log('req.file:', req.file);
-    console.log('req.body:', req.body);
 
     if (!imagefile) {
       return next(createHttpError(400, 'Image is required'));

@@ -88,6 +88,13 @@ const getCourseById = async (
   try {
     const course = await prisma.course.findUnique({
       where: { id: courseId },
+      include: {
+        mentors: {
+          include: {
+            mentor: true,
+          }
+        }
+      }
     });
 
     if (!course) {
@@ -237,6 +244,13 @@ const getAllCourses = async (
       orderBy: {
         createdAt: "desc",
       },
+      include: {
+        mentors: {
+          include: {
+            mentor: true,
+          },
+        },
+      }
     });
 
     if (courses.length === 0) {
