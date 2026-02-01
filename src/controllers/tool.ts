@@ -25,5 +25,19 @@ const createTool = async (req: Request, res: Response, next: NextFunction) => {
   }
 };
 
+const getAllTools = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const tools = await prisma.tool.findMany({
+      orderBy: {
+        createdAt: 'desc',
+      },
+    });
 
-export { createTool };
+    return res.status(200).json(tools);
+  } catch (error) {
+    console.log(error);
+    return next(createHttpError(500, 'Error while fetching tools'));
+  }
+};
+
+export { createTool, getAllTools };
