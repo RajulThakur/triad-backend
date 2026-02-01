@@ -75,4 +75,33 @@ const updateTool = async (req: Request, res: Response, next: NextFunction) => {
   }
 };
 
-export { createTool, getAllTools, updateTool };
+const deleteTool = async (req: Request, res: Response, next: NextFunction) => {
+  const { id } = req.params;
+
+  if (!id || Array.isArray(id)) {
+    return next(createHttpError(400, 'Tool id is required'));
+  }
+
+  try {
+    const tool = await prisma.tool.findUnique({
+      where: { id },
+    });
+
+    if (!tool) {
+      return next(createHttpError(404, 'Tool not found'));
+    }
+
+    await prisma.tool.delete({
+      where: { id },
+    });
+
+    return res.status(200).json({
+      message: 'Tool deleted successfully',
+    });
+  } catch (error) {
+    console.log(error);
+    return next(createHttpError(500, 'Error while deleting tool'));
+  }
+};
+
+export { createTool, getAllTools, updateTool, deleteTool };
