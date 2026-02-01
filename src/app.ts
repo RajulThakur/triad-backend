@@ -20,4 +20,8 @@ app.use("/api/v1/courses", courseRouter);
 import courseMentorRouter from './routers/course-mentor.js';
 app.use("/api/v1/course-mentor", courseMentorRouter);
 
+// tool router
+import toolRouter from './routers/tool.js';
+app.use("/api/v1/tools", toolRouter);
+
 export default app;
