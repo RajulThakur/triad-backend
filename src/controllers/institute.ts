@@ -46,4 +46,21 @@ const createInstitution = async (
   }
 };
 
-export { createInstitution };
+const getAllInstitutions = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const institutions = await prisma.institution.findMany({
+      orderBy: { createdAt: 'desc' },
+    });
+
+    return res.status(200).json(institutions);
+  } catch (error) {
+    console.log(error);
+    return next(createHttpError(500, 'Error while fetching institutions'));
+  }
+};
+
+export { createInstitution, getAllInstitutions };
