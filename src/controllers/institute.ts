@@ -63,4 +63,64 @@ const getAllInstitutions = async (
   }
 };
 
-export { createInstitution, getAllInstitutions };
+const updateInstitution = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  const { id } = req.params;
+
+  if (!id || Array.isArray(id)) {
+    return next(createHttpError(400, 'Institution id is required'));
+  }
+
+  try {
+    const institution = await prisma.institution.findUnique({
+      where: { id },
+    });
+
+    if (!institution) {
+      return next(createHttpError(404, 'Institution not found'));
+    }
+
+    const data: any = {};
+    const body = req.body || {};
+
+    if (body.name) data.name = body.name;
+
+    // SAFE logo replacement
+    if (req.file) {
+      // 1. Upload new logo
+      const newLogo = await uploadonCloudinary(req.file.path, {
+        folder: 'institutions',
+      });
+
+      if (!newLogo) {
+        return next(createHttpError(500, 'Logo upload failed'));
+      }
+
+      data.logo = newLogo.secure_url;
+    }
+
+    // 2. Update DB
+    const updatedInstitution = await prisma.institution.update({
+      where: { id },
+      data,
+    });
+
+    // 3. Delete old logo AFTER DB update
+    if (req.file && institution.logo) {
+      const oldPublicId = getPublicId(institution.logo);
+      if (oldPublicId) {
+        await deleteOnCloudinary(oldPublicId);
+      }
+    }
+
+    return res.status(200).json(updatedInstitution);
+  } catch (error) {
+    console.log(error);
+    return next(createHttpError(500, 'Error while updating institution'));
+  }
+};
+
+export { createInstitution, getAllInstitutions, updateInstitution };
