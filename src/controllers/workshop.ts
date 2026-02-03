@@ -131,4 +131,45 @@ const updateWorkshop = async (
   }
 };
 
-export { createWorkshop, getAllWorkshops, updateWorkshop };
+const deleteWorkshop = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  const { id } = req.params;
+
+  if (!id || Array.isArray(id)) {
+    return next(createHttpError(400, 'Workshop id is required'));
+  }
+
+  try {
+    const workshop = await prisma.workshop.findUnique({
+      where: { id },
+    });
+
+    if (!workshop) {
+      return next(createHttpError(404, 'Workshop not found'));
+    }
+
+    // Delete image from Cloudinary
+    if (workshop.coverImage) {
+      const publicId = getPublicId(workshop.coverImage);
+      if (publicId) {
+        await deleteOnCloudinary(publicId);
+      }
+    }
+
+    await prisma.workshop.delete({
+      where: { id },
+    });
+
+    return res.status(200).json({
+      message: 'Workshop deleted successfully',
+    });
+  } catch (error) {
+    console.log(error);
+    return next(createHttpError(500, 'Error while deleting workshop'));
+  }
+};
+
+export { createWorkshop, getAllWorkshops, updateWorkshop, deleteWorkshop };
