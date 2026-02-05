@@ -33,4 +33,21 @@ const createCareer = async (
   }
 };
 
-export { createCareer };
+const getAllCareers = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const careers = await prisma.career.findMany({
+      orderBy: { createdAt: 'desc' },
+    });
+
+    return res.status(200).json(careers);
+  } catch (error) {
+    console.log(error);
+    return next(createHttpError(500, 'Error while fetching careers'));
+  }
+};
+
+export { createCareer, getAllCareers };
