@@ -20,6 +20,7 @@ model Mentor {
   experience  String
   designation String
   linkedinUrl String
+  quote       String
 
   courses CourseMentor[]
 
@@ -42,6 +43,7 @@ model Course {
   features        String[]
 
   mentors CourseMentor[]
+  testimonials testimonials[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -88,6 +90,8 @@ model Institution {
   id   String @id @default(cuid())
   name String
   logo String
+  city String
+  state String
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -132,4 +136,49 @@ model Career {
   applyLink   String
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+}
+
+model contact_email {
+  id String @id
+  email String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model contact_phone {
+  id String @id
+  country_code String
+  phone String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model social_link{
+  id String @id
+  name String
+  url String
+  icon String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model metrics{
+  id String @id
+  total_students Int
+  total_workshops Int
+  total_projects Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model testimonials{
+  id String @id
+  name String
+  role String
+  image String
+  quote String
+  courseId String
+  course   Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
