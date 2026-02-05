@@ -13,6 +13,11 @@ datasource db {
   provider = "postgresql"
 }
 
+enum TestimonialType {
+  GENERAL
+  COURSE
+}
+
 model Mentor {
   id          String @id @default(cuid())
   name        String
@@ -20,6 +25,7 @@ model Mentor {
   experience  String
   designation String
   linkedinUrl String
+  qoute       String
 
   courses CourseMentor[]
 
@@ -40,8 +46,11 @@ model Course {
   originalPrice   Int
   discountedPrice Int
   features        String[]
+  isRunning       Boolean  @default(false)
 
-  mentors CourseMentor[]
+  mentors      CourseMentor[]
+  tools        CourseTool[]
+  testimonials Testimonial[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -60,15 +69,28 @@ model CourseMentor {
 }
 
 model Tool {
-  id          String @id @default(cuid())
+  id          String  @id @default(cuid())
   name        String
   description String
   url         String
   icon        String?
   coverImage  String?
 
+  courses CourseTool[]
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model CourseTool {
+  id       String @id @default(cuid())
+  courseId String
+  toolId   String
+
+  course Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  tool   Tool   @relation(fields: [toolId], references: [id], onDelete: Cascade)
+
+  @@unique([courseId, toolId])
 }
 
 model Workshop {
@@ -85,16 +107,18 @@ model Workshop {
 }
 
 model Institution {
-  id   String @id @default(cuid())
-  name String
-  logo String
+  id    String @id @default(cuid())
+  name  String
+  logo  String
+  city  String
+  state String
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
 model PrivacyPolicy {
-  id            String   @id @default(cuid())
+  id            String @id @default(cuid())
   content       String
   effectiveDate String
 
@@ -103,7 +127,7 @@ model PrivacyPolicy {
 }
 
 model TermsOfService {
-  id            String   @id @default(cuid())
+  id            String @id @default(cuid())
   content       String
   effectiveDate String
 
@@ -132,4 +156,48 @@ model Career {
   applyLink   String
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+}
+
+model Contact {
+  id           String   @id @default(cuid())
+  email        String
+  phone        String
+  country_code String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model Social {
+  id        String   @id @default(cuid())
+  name      String
+  url       String
+  icon      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Metrics {
+  id              String   @id @default(cuid())
+  total_students  Int
+  total_workshops Int
+  total_projects  Int
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+model Testimonial {
+  id    String          @id @default(cuid())
+  name  String
+  role  String?
+  image String?
+  quote String
+  type  TestimonialType @default(GENERAL)
+
+  courseId String?
+  course   Course? @relation(fields: [courseId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([courseId])
 }
